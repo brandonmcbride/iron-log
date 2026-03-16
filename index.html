@@ -361,11 +361,10 @@ function dayProg(plan,di){
 }
 function calcStreak(){
   let s=0;const c=new Date(today);
-  // Start from yesterday if today is incomplete — don't penalize for a day in progress
   const todayWk=weekKey(c),todayDi2=(c.getDay()+6)%7;
   const todayPlan=S.get('il:plan:'+todayWk);
   const todayDone=todayPlan?dayProg(todayPlan,todayDi2):0;
-  if(todayDone<0.8) c.setDate(c.getDate()-1); // skip today
+  if(todayDone<0.8) c.setDate(c.getDate()-1);
   for(let i=0;i<60;i++){
     const wk2=weekKey(c),di2=(c.getDay()+6)%7;
     const p2=S.get('il:plan:'+wk2);
@@ -374,6 +373,10 @@ function calcStreak(){
     s++;c.setDate(c.getDate()-1);
   }
   streak=s;S.set('il:streak',s);
+  // Patch the header immediately without full re-render
+  const cfg=DAY_CFG[activeDay];
+  const el=document.querySelector('.sk-num');
+  if(el){el.textContent=s;el.style.color=s>0?cfg.acc:'var(--muted)';}
 }
 
 // ─── AI GENERATION ──────────────────────────────────────────────────────────
