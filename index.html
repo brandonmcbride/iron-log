@@ -489,10 +489,18 @@ function render(){
   }
 
   const isLate=todayDi>=4;
-  const nxtExists=!!S.get('il:plan:'+nxtWk)||confirmedWeeks.has(nxtWk);
-  const showGen=viewWk===curWk&&isLate;
   const isCurWk=viewWk===curWk;
-  const prevWk=(()=>{const d=new Date(viewWk+'T00:00:00');d.setDate(d.getDate()-7);return d.toISOString().split('T')[0];})();
+
+  // Always compute prev/next relative to the week being VIEWED, not curWk
+  const viewPrevWk=(()=>{const d=new Date(viewWk+'T00:00:00');d.setDate(d.getDate()-7);return d.toISOString().split('T')[0];})();
+  const viewNxtWk=(()=>{const d=new Date(viewWk+'T00:00:00');d.setDate(d.getDate()+7);return d.toISOString().split('T')[0];})();
+  const viewNxtExists=!!S.get('il:plan:'+viewNxtWk)||confirmedWeeks.has(viewNxtWk);
+  const showGen=isCurWk&&isLate;
+
+  // Only show generate banner on current week; next week nav just navigates if plan exists
+  const nxtBtnAction=viewNxtExists?`switchWeek('${viewNxtWk}')`:`generatePlan()`;
+  const nxtBtnLabel=viewNxtExists?'NEXT WEEK →':(isCurWk&&isLate?'GENERATE NEXT →':'NEXT WEEK →');
+  const nxtBtnOpacity=viewNxtExists?1:isCurWk&&isLate?.7:.3;
 
   // Date for the selected day (not always today)
   const selDateStr=dayDate(viewWk,activeDay);
@@ -548,9 +556,9 @@ function render(){
     <div class="wklbl">
       <span>${isCurWk?'THIS WEEK':weekLabel(viewWk).toUpperCase()}</span>
       <div style="display:flex;gap:12px;align-items:center;">
-        <span style="color:${cfg.acc};cursor:pointer;opacity:.7" onclick="switchWeek('${prevWk}')">← LAST WEEK</span>
+        <span style="color:${cfg.acc};cursor:pointer;opacity:.7" onclick="switchWeek('${viewPrevWk}')">← LAST WEEK</span>
         ${!isCurWk?`<span style="color:${cfg.acc};cursor:pointer" onclick="switchWeek('${curWk}')">THIS WEEK</span>`:''}
-        <span style="color:${cfg.acc};cursor:pointer;opacity:${nxtExists?.7:.3}" onclick="${nxtExists?`switchWeek('${nxtWk}')`:'generatePlan()'}">NEXT WEEK →</span>
+        <span style="color:${cfg.acc};cursor:pointer;opacity:${nxtBtnOpacity}" onclick="${nxtBtnAction}">${nxtBtnLabel}</span>
       </div>
     </div>
 
@@ -559,9 +567,8 @@ function render(){
         const p=dayProg(plan,i);
         const isAct=i===activeDay;
         const isTod=isCurWk&&i===todayDi;
-        return `<button class="db${isAct?' active':''}"
-          style="${isAct?`border-color:${dc.acc};color:${dc.acc};border-width:2px;`:''}${isTod&&!isAct?'border-color:#1e3a5f;color:#60a5fa;':''}"
-          onclick="switchDay(${i})">
+        return `<button class="db${isAct?' active':''}" data-day="${i}"
+          style="${isAct?`border-color:${dc.acc};color:${dc.acc};border-width:2px;`:''}${isTod&&!isAct?'border-color:#1e3a5f;color:#60a5fa;':''}">
           <span class="dab">${dc.abbr}</span>
           <span class="dem">${dc.emoji}</span>
           <div class="dbw"><div class="dbb" style="width:${Math.round(p*100)}%;background:${dc.acc}"></div></div>
@@ -571,10 +578,10 @@ function render(){
     </div>
 
     ${showGen?`<div class="gen-banner" onclick="generatePlan()">
-      <span class="gen-icon">${nxtExists?'↺':'🤖'}</span>
+      <span class="gen-icon">${viewNxtExists?'↺':'🤖'}</span>
       <div>
-        <div class="gen-title">${nxtExists?'REGENERATE NEXT WEEK':'GENERATE NEXT WEEK'}</div>
-        <div class="gen-sub">${nxtExists?'Replace current plan with a new AI-generated one':'AI analyzes this week and builds your personalized plan'}</div>
+        <div class="gen-title">${viewNxtExists?'REGENERATE NEXT WEEK':'GENERATE NEXT WEEK'}</div>
+        <div class="gen-sub">${viewNxtExists?'Replace current plan with a new AI-generated one':'AI analyzes this week and builds your personalized plan'}</div>
       </div>
       <span class="gen-arrow">›</span>
     </div>`:''}
@@ -775,8 +782,13 @@ function doReset(){
 }
 
 // ─── INIT ───────────────────────────────────────────────────────────────────
+// Delegated listener for day strip — survives innerHTML re-renders
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('#dstrip .db');
+  if(btn){const i=parseInt(btn.dataset.day);if(!isNaN(i))switchDay(i);}
+});
+
 (async()=>{
-  // Show loading while Firebase syncs
   document.getElementById('ldg').style.display='flex';
   document.getElementById('ldg-msg').textContent='SYNCING DATA...';
   await initFirebase();
