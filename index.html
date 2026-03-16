@@ -492,6 +492,7 @@ function render(){
   const nxtExists=!!S.get('il:plan:'+nxtWk)||confirmedWeeks.has(nxtWk);
   const showGen=viewWk===curWk&&isLate;
   const isCurWk=viewWk===curWk;
+  const prevWk=(()=>{const d=new Date(viewWk+'T00:00:00');d.setDate(d.getDate()-7);return d.toISOString().split('T')[0];})();
 
   // Date for the selected day (not always today)
   const selDateStr=dayDate(viewWk,activeDay);
@@ -546,8 +547,11 @@ function render(){
 
     <div class="wklbl">
       <span>${isCurWk?'THIS WEEK':weekLabel(viewWk).toUpperCase()}</span>
-      ${!isCurWk?`<span style="color:${cfg.acc};cursor:pointer" onclick="switchWeek('${curWk}')">← THIS WEEK</span>`:''}
-      ${nxtExists&&isCurWk?`<span style="color:${cfg.acc};cursor:pointer" onclick="switchWeek('${nxtWk}')">NEXT WEEK →</span>`:''}
+      <div style="display:flex;gap:12px;align-items:center;">
+        <span style="color:${cfg.acc};cursor:pointer;opacity:.7" onclick="switchWeek('${prevWk}')">← LAST WEEK</span>
+        ${!isCurWk?`<span style="color:${cfg.acc};cursor:pointer" onclick="switchWeek('${curWk}')">THIS WEEK</span>`:''}
+        <span style="color:${cfg.acc};cursor:pointer;opacity:${nxtExists?.7:.3}" onclick="${nxtExists?`switchWeek('${nxtWk}')`:'generatePlan()'}">NEXT WEEK →</span>
+      </div>
     </div>
 
     <div class="ds" id="dstrip">
