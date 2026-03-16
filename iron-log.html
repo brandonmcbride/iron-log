@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IRON LOG</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#06090f;--card:#0d1220;--border:#1a2235;--border2:#243050;--text:#f1f5f9;--muted:#64748b;--sub:#94a3b8;--r:12px;}
+html,body{background:var(--bg);}
+body{color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;min-height:100vh;max-width:520px;margin:0 auto;padding-bottom:120px;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.hdr{padding:20px 20px 12px;display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;z-index:10;background:linear-gradient(to bottom,var(--bg) 85%,transparent);}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:3px;line-height:1;}
+.dstr{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-top:3px;}
+.sk-box{text-align:right;}
+.sk-num{font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;}
+.sk-lbl{font-size:9px;letter-spacing:2px;color:var(--muted);}
+.ds{display:flex;gap:6px;padding:0 16px 16px;overflow-x:auto;scrollbar-width:none;}
+.ds::-webkit-scrollbar{display:none;}
+.db{flex:0 0 auto;width:54px;padding:8px 4px;background:transparent;border:1.5px solid var(--border);border-radius:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:all .2s;font-family:inherit;}
+.db:hover{transform:translateY(-2px);}
+.db.active{background:var(--card);}
+.dab{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.5px;font-weight:500;}
+.dem{font-size:18px;line-height:1;}
+.dbw{width:32px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.dbb{height:100%;border-radius:2px;transition:width .4s ease;}
+.dck{font-size:11px;height:14px;display:block;}
+.wc{margin:0 16px 16px;padding:16px 18px;background:var(--card);border-radius:var(--r);border:1px solid var(--border);border-left:3px solid var(--acc);animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.wt{display:flex;justify-content:space-between;align-items:flex-start;}
+.wn{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;line-height:1;}
+.wf{font-size:11px;color:var(--sub);margin-top:5px;letter-spacing:.3px;line-height:1.5;}
+.wm{text-align:right;flex-shrink:0;margin-left:12px;}
+.wd{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;}
+.wc2{font-size:11px;color:var(--muted);margin-top:3px;}
+.wpw{margin-top:14px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.wpb{height:100%;border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+.wcmp{margin-top:10px;font-size:11px;font-weight:600;letter-spacing:1.5px;}
+.wklbl{padding:0 16px 8px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;display:flex;justify-content:space-between;align-items:center;}
+.cn-card{margin:0 16px 14px;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r);border-left:3px solid var(--acc);}
+.cn-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:5px;}
+.cn-txt{font-size:12px;color:var(--sub);line-height:1.6;}
+.sec{margin-bottom:20px;}
+.slbl{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2.5px;margin-bottom:8px;padding:0 16px;}
+.ec{margin:0 16px 6px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:background .2s,border-color .2s;}
+.ec.done{border-color:var(--acc-lt);}
+.er{display:flex;align-items:center;gap:12px;padding:12px 14px;}
+.eck{width:22px;height:22px;border-radius:6px;flex-shrink:0;border:2px solid var(--border2);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-size:13px;font-weight:700;color:#fff;}
+.eck:hover{transform:scale(1.1);}
+.eck.chk{background:var(--acc);border-color:var(--acc);}
+.ei{flex:1;min-width:0;}
+.en{font-size:14px;font-weight:600;line-height:1.2;transition:color .2s;}
+.ec.done .en{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--muted);}
+.etg{display:flex;gap:8px;margin-top:4px;align-items:center;flex-wrap:wrap;}
+.tr{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;padding:2px 7px;border-radius:4px;}
+.tw{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;}
+.teq{font-size:10px;color:var(--muted);}
+.tipb{background:none;border:none;cursor:pointer;font-size:15px;padding:2px 4px;flex-shrink:0;opacity:.4;transition:opacity .2s;}
+.tipb:hover{opacity:1;}
+.tipp{font-size:12px;color:var(--sub);line-height:1.6;padding:0 14px 12px 48px;border-top:1px solid var(--border);padding-top:10px;}
+.nw{padding:0 16px;margin-bottom:24px;}
+.nl{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2.5px;margin-bottom:8px;}
+textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:13px;padding:12px 14px;font-family:'IBM Plex Sans',sans-serif;line-height:1.6;resize:none;outline:none;transition:border-color .2s;}
+textarea:focus{border-color:var(--border2);}
+textarea::placeholder{color:#2a3a55;}
+.ws{margin:16px 16px 0;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;}
+.wst{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2.5px;margin-bottom:12px;}
+.wsg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.wsi{text-align:center;}
+.wsn{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1;}
+.wsl{font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:.5px;}
+.wgg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px;}
+.wgc{height:28px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'IBM Plex Mono',monospace;background:var(--border);color:var(--muted);transition:all .2s;cursor:pointer;}
+.gen-banner{margin:0 16px 16px;padding:14px 16px;background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(249,115,22,.08));border:1px solid rgba(245,158,11,.3);border-radius:var(--r);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;animation:fadeUp .4s ease;}
+.gen-banner:hover{background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(249,115,22,.14));border-color:rgba(245,158,11,.5);}
+.gen-icon{font-size:24px;flex-shrink:0;}
+.gen-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;color:#f59e0b;}
+.gen-sub{font-size:11px;color:var(--sub);margin-top:2px;}
+.gen-arrow{margin-left:auto;font-size:18px;color:#f59e0b;opacity:.7;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:100;overflow-y:auto;padding:20px 0 40px;}
+.ov-inner{max-width:520px;margin:0 auto;padding:0 16px;}
+.ov-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:#f59e0b;}
+.ov-sub{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.5;margin-bottom:16px;}
+.ov-coach{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:var(--r);padding:12px 14px;margin-bottom:16px;}
+.ov-coach-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;color:#f59e0b;margin-bottom:5px;}
+.ov-coach-txt{font-size:12px;color:var(--sub);line-height:1.6;}
+.ov-day{margin-bottom:10px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.ov-day-hdr{padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.ov-day-name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1.5px;}
+.ov-day-meta{font-size:10px;color:var(--muted);margin-left:auto;}
+.ov-ex{padding:6px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.03);}
+.ov-ex:last-child{border-bottom:none;}
+.ov-ex-n{font-size:12px;font-weight:500;flex:1;min-width:0;padding-right:8px;}
+.ov-ex-r{font-family:'IBM Plex Mono',monospace;font-size:10px;white-space:nowrap;}
+.ov-btns{display:flex;gap:10px;margin-top:16px;}
+.btn-confirm{flex:1;padding:14px;background:#f59e0b;color:#000;border:none;border-radius:var(--r);font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;transition:all .2s;}
+.btn-confirm:hover{background:#fbbf24;}
+.btn-regen{padding:12px 14px;background:transparent;color:var(--sub);border:1px solid var(--border2);border-radius:var(--r);font-size:12px;cursor:pointer;}
+.btn-cancel{padding:12px 14px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:var(--r);font-size:12px;cursor:pointer;}
+.loading-ov{position:fixed;inset:0;background:rgba(6,9,15,.92);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.spinner{width:36px;height:36px;border:3px solid var(--border2);border-top-color:#f59e0b;border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--sub);letter-spacing:1.5px;}
+.rst-btn{display:block;margin:12px auto 0;background:none;border:1px solid var(--border);color:var(--muted);font-size:10px;letter-spacing:1px;padding:6px 14px;border-radius:6px;cursor:pointer;font-family:'IBM Plex Mono',monospace;}
+</style>
+<!-- Firebase compat SDK -->
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-app-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<div id="ov" style="display:none"></div>
+<div id="ldg" style="display:none" class="loading-ov">
+  <div class="spinner"></div>
+  <div class="loading-txt" id="ldg-msg">GENERATING PLAN...</div>
+</div>
+<script>
+// ─── EXERCISE LIBRARY ───────────────────────────────────────────────────────
+const LIB=[
+  // MON
+  {id:"mw1",n:"Band Pull-Aparts",eq:"Resistance band",tip:"Arms straight, fully retract shoulder blades on each rep. Reverses the rounded-shoulder pattern from sitting and cycling. Do this every push session.",defS:2,defR:"15",defW:null,slot:"scap_wu",day:0},
+  {id:"mw2",n:"Prone Shoulder Circles",eq:"Yoga mat",tip:"Face down, slowly circle arms from Y to T to W positions. Pure scapular mobility warm-up — takes 2 minutes and pays dividends all session.",defS:2,defR:"10 circles",defW:null,slot:"scap_wu",day:0},
+  {id:"mw3",n:"Arm Circles + Thoracic Rotation",eq:"Bodyweight",tip:"Big slow arm circles then hands-behind-head thoracic rotation each side. Wakes up the rotator cuff and upper spine before any pressing.",defS:1,defR:"10 each way",defW:null,slot:"thor_wu",day:0},
+  {id:"mw4",n:"Cat-Cow + Thread the Needle",eq:"Yoga mat",tip:"5 cat-cows then thread the needle each side. Opens thoracic spine and shoulder girdle before loading.",defS:1,defR:"8 each",defW:null,slot:"thor_wu",day:0},
+  {id:"ms1",n:"Barbell Bench Press",eq:"Barbell + bench",tip:"3-sec descent, light touch to chest, drive through heels. Elbows at ~45° to torso — not flared. Your primary horizontal push.",defS:4,defR:"8",defW:"115 lb",slot:"h_push",day:0},
+  {id:"ms2",n:"Dumbbell Bench Press",eq:"25 lb dumbbells + bench",tip:"Full ROM — let elbows drop below chest at bottom. Good unilateral stability variation. Alternate with barbell bench month to month.",defS:4,defR:"10",defW:"25 lb",slot:"h_push",day:0},
+  {id:"ms3",n:"Close-Grip Bench Press",eq:"Barbell + bench",tip:"Hands shoulder-width, elbows tight to body. Shifts emphasis to triceps while still training chest. Good for tennis follow-through.",defS:4,defR:"8",defW:"95 lb",slot:"h_push",day:0},
+  {id:"ms4",n:"Dumbbell Overhead Press",eq:"25 lb dumbbells",tip:"Ribs down, neutral spine — don't arch your lower back. Builds shoulder strength for the tennis serve.",defS:3,defR:"10",defW:"25 lb",slot:"v_push",day:0},
+  {id:"ms5",n:"Arnold Press",eq:"25 lb dumbbells",tip:"Rotate from palms-facing-in at bottom to palms-forward at top. Hits all three delt heads. Good when overhead pressing has felt stale.",defS:3,defR:"10",defW:"15 lb",slot:"v_push",day:0},
+  {id:"ms6",n:"Seated DB Shoulder Press",eq:"25 lb dumbbells + bench",tip:"Seated removes leg drive — pure shoulder strength. Useful for eliminating compensation patterns.",defS:3,defR:"10",defW:"25 lb",slot:"v_push",day:0},
+  {id:"ms7",n:"Band Face Pulls",eq:"Resistance band",tip:"Pull to forehead height, elbows high, externally rotate at end. Most important posture exercise you have. Do every push session without exception.",defS:3,defR:"15",defW:null,slot:"post_pull",day:0},
+  {id:"ms8",n:"Band External Rotations",eq:"Resistance band",tip:"Elbow at 90°, rotate outward against band resistance. Directly trains rotator cuff muscles that stabilize the shoulder during tennis strokes.",defS:3,defR:"15 each",defW:null,slot:"post_pull",day:0},
+  {id:"mp1",n:"Prone Y-T-W Raises",eq:"5 lb DBs or bodyweight",tip:"Y (overhead), T (sides), W (bent elbows). Light weight ONLY — scapular retraining, not strength. Squeeze hard at the top of each position.",defS:3,defR:"8 each",defW:"5 lb",slot:"scap_raise",day:0},
+  {id:"mp2",n:"Bent-Over Rear Delt Fly",eq:"10 lb dumbbells",tip:"Hinge forward, arms hang, lift to sides with slight elbow bend. Rear delt strength is critical for posture and shoulder health.",defS:3,defR:"12",defW:"10 lb",slot:"scap_raise",day:0},
+  {id:"mp3",n:"Dumbbell Lateral Raises",eq:"10 lb dumbbells",tip:"Lead with elbows, slight forward lean. Don't shrug at the top. Builds medial delt for overhead stability.",defS:3,defR:"12",defW:"10 lb",slot:"scap_raise",day:0},
+  {id:"mp4",n:"Wall Angels",eq:"Flat wall",tip:"Entire spine against wall — head, upper back, butt, heels. Slide arms up and down like a snow angel. If you can't maintain contact, that's exactly what this is fixing.",defS:2,defR:"10",defW:null,slot:"wall_drill",day:0},
+  {id:"mp5",n:"Wall Chest Stretch + Rotation",eq:"Wall",tip:"Arm against wall at 90°, rotate body away slowly. Targets pec minor — the tight muscle that causes rounded shoulders in people who press a lot.",defS:2,defR:"45s each side",defW:null,slot:"wall_drill",day:0},
+  // TUE
+  {id:"tw1",n:"Leg Swings + Hip Circles",eq:"Bodyweight",tip:"Front/back and lateral swings, then hip circles. Opens hip flexors and hamstrings before the ride. Skip this and your lower back will notice.",defS:1,defR:"10 each way",defW:null,slot:"pre_ride",day:1},
+  {id:"tw2",n:"Glute Bridge + Hip Flexor Stretch",eq:"Yoga mat",tip:"10 slow glute bridges then 30s hip flexor stretch each side. Activates glutes and counteracts the flexion position of cycling.",defS:1,defR:"10 + 30s",defW:null,slot:"pre_ride",day:1},
+  {id:"ts1",n:"Easy Warm-Up Spin",eq:"Road bike",tip:"High cadence ~90 RPM, minimal resistance. Let your legs and cardio wake up before pushing any effort.",defS:1,defR:"5 min",defW:null,slot:"easy_spin",day:1},
+  {id:"ts2",n:"Zone 2 Steady-State Ride",eq:"Road bike",tip:"65–75% max HR — you can speak full sentences but not sing. Most important fitness work for triathlon. Builds mitochondrial density, fat oxidation, and cardiac output. Every consistent session compounds.",defS:1,defR:"30 min",defW:null,slot:"main_ride",day:1},
+  {id:"ts3",n:"Cadence Intervals Ride",eq:"Road bike",tip:"3 min at 100+ RPM light gear / 3 min at 70–80 RPM moderate resistance. Improves pedaling efficiency and neuromuscular coordination. Good variation from pure Zone 2.",defS:1,defR:"30 min (5 rounds)",defW:null,slot:"main_ride",day:1},
+  {id:"ts4",n:"Hill Repeat Ride",eq:"Road bike",tip:"Find a moderate incline, 80–85% effort up, easy spin back down. 4–5 repeats. Builds cycling-specific leg strength and lifts lactate threshold.",defS:1,defR:"30 min",defW:null,slot:"main_ride",day:1},
+  {id:"tc1",n:"Easy Cool-Down Spin",eq:"Road bike",tip:"Let HR drop below 120 before stopping. Clears lactate faster than stopping abruptly.",defS:1,defR:"3 min",defW:null,slot:"cd_spin",day:1},
+  {id:"tc2",n:"Hip Flexor + Quad Stretch",eq:"Yoga mat",tip:"Kneeling lunge, tuck pelvis forward, arms overhead. CRITICAL after every ride. This single stretch prevents most lower back issues in cyclists.",defS:2,defR:"60s each side",defW:null,slot:"post_stretch",day:1},
+  {id:"tc3",n:"Figure-4 + Hamstring Fold",eq:"Yoga mat",tip:"Figure-4 targets piriformis (chronically tight in cyclists), then seated hamstring fold. 3 slow breaths per position.",defS:2,defR:"60s each",defW:null,slot:"post_stretch",day:1},
+  // WED
+  {id:"ww1",n:"Dead Hang",eq:"Pull-up bar",tip:"Fully relax shoulders, let them shrug to ears, then actively pull them down. Decompresses spine and primes grip. Start every pull day here.",defS:2,defR:"25s",defW:null,slot:"hang_wu",day:2},
+  {id:"ww2",n:"Scapular Pull-Ups",eq:"Pull-up bar",tip:"Dead hang, then shrug shoulders DOWN without bending elbows. Teaches the lat engagement pattern before full pull-ups.",defS:2,defR:"10",defW:null,slot:"hang_wu",day:2},
+  {id:"ww3",n:"Band Pull-Aparts",eq:"Resistance band",tip:"Rear delt and rotator cuff activation before loading any pulling movements.",defS:2,defR:"15",defW:null,slot:"band_wu",day:2},
+  {id:"ws1",n:"Pull-Ups",eq:"Pull-up bar",tip:"Dead hang at bottom, chin fully over bar at top. 3-second controlled descent. Use band assist if under 5 clean reps. Best upper body exercise there is.",defS:4,defR:"max",defW:null,slot:"vert_pull",day:2},
+  {id:"ws2",n:"Band-Assisted Pull-Ups",eq:"Pull-up bar + band",tip:"Band looped over bar and under knees. Same full-ROM form. Progress by using lighter bands over weeks.",defS:4,defR:"8",defW:null,slot:"vert_pull",day:2},
+  {id:"ws3",n:"Weighted Pull-Ups",eq:"Pull-up bar + dumbbell",tip:"Only attempt when you can do 10+ clean bodyweight reps. Add 10–15 lb between feet. Same full-ROM form.",defS:4,defR:"6",defW:"10 lb",slot:"vert_pull",day:2},
+  {id:"ws4",n:"Barbell Bent-Over Row",eq:"Barbell",tip:"Hinge at hip, torso ~45°, pull to lower chest. Squeeze hard at top. Don't round your lower back — keep it engaged.",defS:3,defR:"8",defW:"95 lb",slot:"horiz_pull",day:2},
+  {id:"ws5",n:"Single-Arm Dumbbell Row",eq:"25 lb dumbbell + bench",tip:"Elbow close to body, full stretch at bottom. Keep hips square — don't rotate. Great for addressing unilateral imbalances.",defS:3,defR:"10 each",defW:"25 lb",slot:"horiz_pull",day:2},
+  {id:"ws6",n:"Band Seated Row",eq:"Resistance band",tip:"Anchor band at chest height, pull elbows back, squeeze shoulder blades at end. Good option on deload weeks.",defS:3,defR:"15",defW:null,slot:"horiz_pull",day:2},
+  {id:"ws7",n:"Kettlebell Swings",eq:"35 lb kettlebell",tip:"Hip HINGE — not a squat. Power from snapping hips forward. Bell floats to chest from momentum alone.",defS:3,defR:"15",defW:"35 lb",slot:"hip_hinge",day:2},
+  {id:"ws8",n:"Romanian Deadlift",eq:"Barbell",tip:"Push hips BACK, bar close to legs, feel hamstring load. 3-sec descent. Direct carryover to triathlon and injury prevention.",defS:3,defR:"8",defW:"95 lb",slot:"hip_hinge",day:2},
+  {id:"wg1",n:"Hangboard Dead Hangs",eq:"Hangboard",tip:"Largest holds only. Full open-hand grip — DO NOT crimp. Your grip strength foundation for tennis. Progress to smaller holds over weeks not days.",defS:4,defR:"30s on / 60s off",defW:null,slot:"grip_str",day:2},
+  {id:"wg2",n:"Farmer Carries",eq:"25 lb dumbbells",tip:"Stand tall, shoulders packed down, walk briskly. Grip + core + posture in one movement. Hard to overdo this exercise.",defS:3,defR:"35m",defW:"25 lb",slot:"grip_str",day:2},
+  {id:"wg3",n:"Reverse Curls",eq:"15 lb dumbbells",tip:"Overhand grip, full curl. Builds wrist extensors — almost always weak relative to flexors. This imbalance IS tennis elbow. Non-negotiable.",defS:3,defR:"12",defW:"15 lb",slot:"forearm",day:2},
+  // THU
+  {id:"lw1",n:"Lateral Band Walks",eq:"Band around knees",tip:"Pre-activates glute medius before loading squats. Critical for knee tracking, lateral court movement, and preventing IT band issues.",defS:2,defR:"15 each way",defW:null,slot:"glute_act",day:3},
+  {id:"lw2",n:"Leg Swings + Bodyweight Squats",eq:"Bodyweight",tip:"10 leg swings to open hips, then 12 bodyweight squats to groove the pattern before loading.",defS:1,defR:"10 + 12",defW:null,slot:"leg_wu",day:3},
+  {id:"lw3",n:"Hip 90/90 + Glute Bridge",eq:"Yoga mat",tip:"Sit in 90/90 position and rotate forward over front leg, then 10 slow glute bridges. Opens hips and activates posterior chain.",defS:1,defR:"8 each + 10",defW:null,slot:"leg_wu",day:3},
+  {id:"ls1",n:"Barbell Back Squat",eq:"Barbell + plates",tip:"Big breath, brace hard, break at hip and knee simultaneously. Knees track over toes and push OUT. King of leg exercises.",defS:4,defR:"8",defW:"115 lb",slot:"knee_dom",day:3},
+  {id:"ls2",n:"Goblet Squat",eq:"35 lb kettlebell",tip:"KB at chest, elbows inside knees at bottom. Improves squat depth and reinforces upright posture.",defS:4,defR:"12",defW:"35 lb",slot:"knee_dom",day:3},
+  {id:"ls3",n:"Front Squat",eq:"Barbell",tip:"Elbows high and forward, upright torso. More quad-dominant than back squat. Good 4-week rotation when back squat has plateaued.",defS:4,defR:"8",defW:"75 lb",slot:"knee_dom",day:3},
+  {id:"ls4",n:"Romanian Deadlift",eq:"Barbell",tip:"Push hips BACK, bar stays close. Trains the deceleration pattern that prevents hamstring pulls on court.",defS:3,defR:"10",defW:"95 lb",slot:"hip_dom",day:3},
+  {id:"ls5",n:"Single-Leg Romanian Deadlift",eq:"25 lb dumbbell",tip:"Hinge on one leg, opposite leg extends behind. Single-leg hip stability critical for tennis court movement.",defS:3,defR:"8 each",defW:"25 lb",slot:"hip_dom",day:3},
+  {id:"ls6",n:"Kettlebell Sumo Deadlift",eq:"35 lb kettlebell",tip:"Wide stance, toes out, KB between feet. Targets inner thighs and glutes. Good variation for hip mobility.",defS:3,defR:"10",defW:"35 lb",slot:"hip_dom",day:3},
+  {id:"ls7",n:"Walking Lunges",eq:"15 lb dumbbells",tip:"Long stride, front knee over ankle. Single-leg stability for tennis split-step and change of direction.",defS:3,defR:"10 each",defW:"15 lb",slot:"single_leg",day:3},
+  {id:"ls8",n:"Reverse Lunges",eq:"15 lb dumbbells",tip:"Step back rather than forward — less knee stress, more glute activation. Use when knees feel sensitive.",defS:3,defR:"10 each",defW:"15 lb",slot:"single_leg",day:3},
+  {id:"ls9",n:"Step-Ups",eq:"Bench + 15 lb dumbbells",tip:"Drive through the heel of the elevated foot, fully extend at top. Don't push off the back foot.",defS:3,defR:"10 each",defW:"15 lb",slot:"single_leg",day:3},
+  {id:"la1",n:"Med Ball Rotational Slams",eq:"10 lb med ball",tip:"Hips fire first, core transfers, arms finish. This IS the tennis groundstroke kinetic chain. Do it slowly to feel the sequence, then add speed.",defS:3,defR:"10 each side",defW:"10 lb",slot:"rot_power",day:3},
+  {id:"la2",n:"Lateral Shuffle Intervals",eq:"Bodyweight",tip:"Stay in a LOW athletic stance. Quick shuffle, plant hard on each direction change. Pure court movement training.",defS:4,defR:"30s / 25s rest",defW:null,slot:"lat_move",day:3},
+  {id:"la3",n:"Lateral Bounds",eq:"Bodyweight",tip:"Jump laterally off one foot, land on the other, absorb and hold 1 second. Builds lateral power and landing stability.",defS:3,defR:"8 each side",defW:null,slot:"lat_move",day:3},
+  {id:"la4",n:"Carioca",eq:"Bodyweight",tip:"Lateral movement with crossover steps, rotating hips. Builds coordination for court footwork. Often neglected, always useful.",defS:3,defR:"20m each way",defW:null,slot:"lat_move",day:3},
+  // FRI
+  {id:"cs1",n:"KB Turkish Get-Up",eq:"25 lb kettlebell",tip:"SLOW is the whole point. Every transition is a stability challenge. The single best full-body stability and shoulder health exercise you can do.",defS:2,defR:"3 each side",defW:"25 lb",slot:"total_stab",day:4},
+  {id:"cs2",n:"Plank Variations",eq:"Yoga mat",tip:"Standard 45s → side plank 30s each → reverse plank 30s. All planes of core stability without spinal loading.",defS:3,defR:"45+30+30s",defW:null,slot:"total_stab",day:4},
+  {id:"cs3",n:"Dead Bug",eq:"Yoga mat",tip:"Lower back PRESSED into floor throughout. Breathe out as you extend opposite arm and leg. If back arches, shorten the range.",defS:3,defR:"10 each side",defW:null,slot:"anti_ext",day:4},
+  {id:"cs4",n:"Ab Wheel Rollout",eq:"Ab wheel or barbell",tip:"From knees, roll out only as far as you can keep lower back flat. Controlled return. Don't rush to full extension.",defS:3,defR:"8",defW:null,slot:"anti_ext",day:4},
+  {id:"cs5",n:"Pallof Press",eq:"Resistance band",tip:"Anchor at chest height, press straight out, RESIST the pull. This is what core actually does in tennis — resist rotation while hips drive.",defS:3,defR:"12 each side",defW:null,slot:"anti_rot",day:4},
+  {id:"cs6",n:"Suitcase Carry",eq:"25 lb dumbbell",tip:"Single DB at side, walk without leaning. Resist the side-bend. Lateral core + grip + posture in one clean movement.",defS:3,defR:"35m each side",defW:"25 lb",slot:"anti_rot",day:4},
+  {id:"cs7",n:"Side Plank",eq:"Yoga mat",tip:"Hip stays stacked and elevated — don't let it sag. Obliques and hip abductors. Lateral core strength for tennis.",defS:3,defR:"30s each side",defW:null,slot:"lat_core",day:4},
+  {id:"cs8",n:"Copenhagen Plank",eq:"Bench",tip:"Side plank with top foot elevated on bench. Serious adductor and lateral core work. Build up time gradually from 15 seconds.",defS:3,defR:"20s each side",defW:null,slot:"lat_core",day:4},
+  {id:"cm1",n:"Pigeon Pose",eq:"Yoga mat",tip:"Deep hip opener that counters cycling tightness. Breathe into the resistance — release happens on the exhale, not by forcing.",defS:2,defR:"90s each side",defW:null,slot:"hip_open",day:4},
+  {id:"cm2",n:"90/90 Hip Stretch",eq:"Yoga mat",tip:"Both legs at 90° on floor, rotate forward over front leg. More active than pigeon — builds hip mobility through range.",defS:2,defR:"8 + 60s hold each",defW:null,slot:"hip_open",day:4},
+  {id:"cm3",n:"Thread the Needle",eq:"Yoga mat",tip:"On hands and knees, thread one arm under and follow with your gaze. Opens thoracic spine and directly improves posture.",defS:2,defR:"10 each side",defW:null,slot:"thor_mob",day:4},
+  {id:"cm4",n:"Foam Roller Thoracic Extension",eq:"Foam roller",tip:"Roller under mid-back, hands behind head, extend over the roller at each spinal segment. Best thoracic mobilization available.",defS:1,defR:"5 at each level",defW:null,slot:"thor_mob",day:4},
+  {id:"cm5",n:"Hip Flexor Lunge Stretch",eq:"Yoga mat",tip:"Arms overhead, TUCK PELVIS under before leaning — that creates the actual stretch. Counters hip flexor shortening from cycling and sitting.",defS:2,defR:"60s each side",defW:null,slot:"hip_flex",day:4},
+  {id:"cm6",n:"World's Greatest Stretch",eq:"Yoga mat",tip:"Lunge forward, same-side hand to floor, rotate upper body reaching other arm to ceiling. Hip flexor + thoracic + hamstring in one movement.",defS:2,defR:"5 each side",defW:null,slot:"wk_flow",day:4},
+  {id:"cm7",n:"Sun Salutation Flow",eq:"Yoga mat",tip:"5 slow rounds moving with breath. Full body through flexion and extension. Great nervous system reset to close out the work week.",defS:1,defR:"5 rounds",defW:null,slot:"wk_flow",day:4},
+  // SAT
+  {id:"rr1",n:"Weighted Ruck March",eq:"Rucksack + 25 lb plate",tip:"3.5–4 mph. Chest tall, core braced. Builds aerobic base, postural strength under load, and mental toughness. Progress to 40 lb over time.",defS:1,defR:"40 min",defW:"25 lb",slot:"ruck",day:5},
+  {id:"rk1",n:"Kettlebell Swings",eq:"35 lb kettlebell",tip:"Hip snap drives the bell — not your arms. Trains the exact power pattern used in cycling sprint and run push-off.",defS:4,defR:"15",defW:"35 lb",slot:"kb_swing",day:5},
+  {id:"rk2",n:"KB Clean + Press",eq:"25 lb kettlebell",tip:"Clean from swing to rack position, then strict press overhead. Full-body power in two linked movements.",defS:4,defR:"6 each side",defW:"25 lb",slot:"kb_press",day:5},
+  {id:"rk3",n:"KB Push Press",eq:"25 lb kettlebell",tip:"Slight knee dip then drive up, pressing at top. More power than strict press. Good when strict press has plateaued.",defS:4,defR:"8 each side",defW:"25 lb",slot:"kb_press",day:5},
+  {id:"rk4",n:"KB Thruster",eq:"25 lb kettlebell",tip:"Squat with KB at shoulder, stand and press at top in one fluid motion. Full-body conditioning in a single movement.",defS:4,defR:"8 each side",defW:"25 lb",slot:"kb_press",day:5},
+  {id:"rk5",n:"Renegade Rows",eq:"15 lb dumbbells",tip:"Hold plank on two DBs, row one at a time. Hips stay SQUARE. Anti-rotation core plus pulling strength simultaneously.",defS:3,defR:"8 each side",defW:"15 lb",slot:"renegade",day:5},
+  {id:"rk6",n:"Med Ball Slams",eq:"10 lb med ball",tip:"Full extension overhead — total body tight — then slam VIOLENTLY into floor. Power output and genuine stress relief.",defS:3,defR:"12",defW:"10 lb",slot:"slam",day:5},
+  {id:"rk7",n:"Med Ball Rotational Slams",eq:"10 lb med ball",tip:"Slam to each side in rotating motion. Targets rotational power that complements Thursday's tennis training.",defS:3,defR:"10 each side",defW:"10 lb",slot:"slam",day:5},
+  {id:"rf1",n:"Push-Up Ladder",eq:"Bodyweight",tip:"8 wide / 8 standard / 8 narrow, no rest between grip positions. Hits chest, shoulders, and triceps from three angles.",defS:3,defR:"8+8+8",defW:null,slot:"upper_fin",day:5},
+  {id:"rf2",n:"Diamond Push-Ups",eq:"Bodyweight",tip:"Hands together forming a diamond. Tricep-dominant push. Good variation when chest has been heavily loaded this week.",defS:3,defR:"12",defW:null,slot:"upper_fin",day:5},
+  {id:"rf3",n:"Run Intervals",eq:"Bodyweight",tip:"60s run at uncomfortable effort / 30s walk. Trains run efficiency for triathlon brick sessions specifically at end of a fatigued state.",defS:3,defR:"60s / 30s rest",defW:null,slot:"cardio_fin",day:5},
+  {id:"rf4",n:"High Knees Intervals",eq:"Bodyweight",tip:"Drive knees to hip height, pump arms hard. 45s on / 20s off. Running fitness for triathlon at the very end when it's hardest.",defS:4,defR:"45s / 20s rest",defW:null,slot:"cardio_fin",day:5},
+  // SUN
+  {id:"sw1",n:"Easy Walk or Very Light Ride",eq:"Road bike or feet",tip:"Zone 1 ONLY — feel better when you finish than when you started. The adaptation from last week happens during this recovery, not the workouts.",defS:1,defR:"20–25 min",defW:null,slot:"easy_move",day:6},
+  {id:"sw2",n:"Gentle Walk Outdoors",eq:"Feet",tip:"No pace target. Sunlight and gentle movement lower cortisol and reset the nervous system better than staying still.",defS:1,defR:"25 min",defW:null,slot:"easy_move",day:6},
+  {id:"sc1",n:"Legs Up the Wall",eq:"Wall + mat",tip:"Best recovery pose for tired legs. Reduces swelling, calms nervous system, improves sleep quality. Start every Sunday session here.",defS:1,defR:"5 min",defW:null,slot:"leg_rec",day:6},
+  {id:"sc2",n:"Seated Spinal Twist",eq:"Yoga mat",tip:"Inhale to lengthen spine, exhale to rotate deeper. Works thoracic and lumbar. 3 slow breaths per side.",defS:2,defR:"90s each side",defW:null,slot:"spine_mob",day:6},
+  {id:"sc3",n:"Supine Knees-to-Chest Rock",eq:"Yoga mat",tip:"Hug knees to chest and slowly rock side to side. Massages the lumbar and sacrum. Completely passive — zero effort.",defS:1,defR:"2 min",defW:null,slot:"spine_mob",day:6},
+  {id:"sc4",n:"Supine Hamstring + Hip Stretch",eq:"Yoga mat + band",tip:"Loop band around foot, lie on back, gently pull leg toward you. Hit both straight-leg and cross-body variations.",defS:2,defR:"60s each side",defW:null,slot:"hip_str",day:6},
+  {id:"sc5",n:"Child's Pose Variations",eq:"Yoga mat",tip:"Wide knees arms extended, then narrow knees, then thread one arm under. Full thoracic and lumbar unload. Let gravity do everything.",defS:1,defR:"2 min",defW:null,slot:"hip_str",day:6},
+  {id:"sc6",n:"Box Breathing",eq:"Quiet space",tip:"4s inhale / 4s hold / 4s exhale / 4s hold. Lowers cortisol and improves HRV. Do Sunday night for best effect on Monday's session.",defS:1,defR:"5 min",defW:null,slot:"ns_reset",day:6},
+  {id:"sc7",n:"Foam Roll Focus Areas",eq:"Foam roller",tip:"Quads, IT band, thoracic spine, calves. 30s on tight spots. About circulation and tissue prep for next week — not pain.",defS:1,defR:"5 min",defW:null,slot:"tissue",day:6},
+];
+
+// ─── DAY CONFIGURATION ──────────────────────────────────────────────────────
+const DAY_CFG=[
+  {i:0,abbr:"MON",emoji:"💪",name:"PUSH + POSTURE",focus:"Chest · Shoulders · Scapular Control · Posture",acc:"#f97316",aLt:"rgba(249,115,22,.3)",aBg:"rgba(249,115,22,.08)",dur:"45 min",
+   secs:[{name:"WARM-UP  ·  5 min",slots:["scap_wu","thor_wu"]},{name:"STRENGTH  ·  28 min",slots:["h_push","v_push","post_pull"]},{name:"POSTURE FINISHER  ·  10 min",slots:["scap_raise","wall_drill"]}]},
+  {i:1,abbr:"TUE",emoji:"🚴",name:"BIKE ENDURANCE",focus:"Aerobic Base · Zone 2 Training · Triathlon Engine",acc:"#06b6d4",aLt:"rgba(6,182,212,.3)",aBg:"rgba(6,182,212,.08)",dur:"45 min",
+   secs:[{name:"WARM-UP  ·  7 min",slots:["pre_ride","easy_spin"]},{name:"MAIN RIDE  ·  30 min",slots:["main_ride"]},{name:"COOL-DOWN  ·  8 min",slots:["cd_spin","post_stretch"]}]},
+  {i:2,abbr:"WED",emoji:"🏔️",name:"PULL + GRIP",focus:"Back · Grip Strength · Tennis Elbow Prevention",acc:"#a855f7",aLt:"rgba(168,85,247,.3)",aBg:"rgba(168,85,247,.08)",dur:"45 min",
+   secs:[{name:"WARM-UP  ·  5 min",slots:["hang_wu","band_wu"]},{name:"STRENGTH  ·  27 min",slots:["vert_pull","horiz_pull","hip_hinge"]},{name:"GRIP + ELBOW  ·  12 min",slots:["grip_str","forearm"]}]},
+  {i:3,abbr:"THU",emoji:"🎾",name:"LEGS + AGILITY",focus:"Quad · Glute · Lateral Power · Tennis Movement",acc:"#84cc16",aLt:"rgba(132,204,22,.3)",aBg:"rgba(132,204,22,.08)",dur:"45 min",
+   secs:[{name:"WARM-UP  ·  7 min",slots:["glute_act","leg_wu"]},{name:"STRENGTH  ·  25 min",slots:["knee_dom","hip_dom","single_leg"]},{name:"TENNIS AGILITY  ·  12 min",slots:["rot_power","lat_move"]}]},
+  {i:4,abbr:"FRI",emoji:"🧘",name:"CORE + MOBILITY",focus:"Core Stability · Thoracic Mobility · Week Recovery",acc:"#f43f5e",aLt:"rgba(244,63,94,.3)",aBg:"rgba(244,63,94,.08)",dur:"45 min",
+   secs:[{name:"CORE  ·  22 min",slots:["total_stab","anti_ext","anti_rot","lat_core"]},{name:"MOBILITY  ·  20 min",slots:["hip_open","thor_mob","hip_flex","wk_flow"]}]},
+  {i:5,abbr:"SAT",emoji:"🎒",name:"BIG DAY — RUCK + POWER",focus:"Loaded Endurance · Full Body Power · Conditioning",acc:"#f59e0b",aLt:"rgba(245,158,11,.3)",aBg:"rgba(245,158,11,.08)",dur:"75–90 min",
+   secs:[{name:"RUCK MARCH  ·  40 min",slots:["ruck"]},{name:"KETTLEBELL COMPLEX  ·  25 min",slots:["kb_swing","kb_press","renegade","slam"]},{name:"FINISHER  ·  10 min",slots:["upper_fin","cardio_fin"]}]},
+  {i:6,abbr:"SUN",emoji:"🌊",name:"RECOVERY + RESET",focus:"Nervous System Recovery · Flexibility · Prep for Week",acc:"#22d3ee",aLt:"rgba(34,211,238,.3)",aBg:"rgba(34,211,238,.08)",dur:"45–60 min",
+   secs:[{name:"EASY MOVEMENT  ·  20 min",slots:["easy_move"]},{name:"DEEP STRETCH  ·  20 min",slots:["leg_rec","spine_mob","hip_str"]},{name:"RESET RITUAL  ·  10 min",slots:["ns_reset","tissue"]}]},
+];
+
+// ─── STORAGE ────────────────────────────────────────────────────────────────
+// In-memory cache — loaded from Firestore on init, written back on every change.
+// Falls back to localStorage if Firebase is unavailable.
+const MEM={};
+let _db=null;
+
+function lsGet(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+const S={
+  get(k){ return MEM.hasOwnProperty(k)?MEM[k]:lsGet(k); },
+  set(k,v){
+    MEM[k]=v; lsSet(k,v);
+    if(_db) _db.collection('ironlog').doc(k).set({v:JSON.stringify(v)}).catch(e=>console.warn('FS write:',e));
+  },
+  del(k){
+    delete MEM[k]; localStorage.removeItem(k);
+    if(_db) _db.collection('ironlog').doc(k).delete().catch(()=>{});
+  }
+};
+
+const FIREBASE_CFG={
+  apiKey:"AIzaSyBYYU7xdkCJ4zfDw_HLNxyTXVqO9EhPDLQ",
+  authDomain:"iron-log-b923a.firebaseapp.com",
+  projectId:"iron-log-b923a",
+  storageBucket:"iron-log-b923a.firebasestorage.app",
+  messagingSenderId:"367715804607",
+  appId:"1:367715804607:web:5db4f66d5755fc5a0a2d0a"
+};
+
+async function initFirebase(){
+  try{
+    firebase.initializeApp(FIREBASE_CFG);
+    _db=firebase.firestore();
+    // Load all stored docs into memory cache
+    const snap=await _db.collection('ironlog').get();
+    snap.forEach(doc=>{
+      try{ MEM[doc.id]=JSON.parse(doc.data().v); }catch(e){}
+    });
+    console.log(`Firebase ready — ${snap.size} records loaded`);
+  }catch(e){
+    console.warn('Firebase unavailable, using localStorage only:',e);
+  }
+}
+
+// ─── WEEK HELPERS ───────────────────────────────────────────────────────────
+function getMonday(d){const dt=new Date(d),day=dt.getDay(),diff=day===0?-6:1-day;dt.setDate(dt.getDate()+diff);dt.setHours(0,0,0,0);return dt;}
+function weekKey(d){return getMonday(d).toISOString().split('T')[0];}
+function dayDate(wk,di){const d=new Date(wk+'T00:00:00');d.setDate(d.getDate()+di);return d.toISOString().split('T')[0];}
+function weekLabel(wk){
+  const m=new Date(wk+'T00:00:00'),s=new Date(m);s.setDate(s.getDate()+6);
+  const f=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  return f(m)+' – '+f(s);
+}
+function nextWeekKey(wk){const d=new Date(wk+'T00:00:00');d.setDate(d.getDate()+7);return d.toISOString().split('T')[0];}
+
+// ─── PLAN BUILDING ──────────────────────────────────────────────────────────
+function slotEx(slot,day){return LIB.find(e=>e.slot===slot&&e.day===day);}
+
+function buildPlan(wk,choices){
+  const plan={weekKey:wk,coachNote:'',days:[]};
+  for(const cfg of DAY_CFG){
+    const day={dayIdx:cfg.i,sections:[]};
+    for(const sec of cfg.secs){
+      const section={name:sec.name,exercises:[]};
+      for(const slot of sec.slots){
+        const ch=choices&&choices[slot];
+        let libEx=ch?LIB.find(e=>e.id===ch.libraryId):null;
+        if(!libEx) libEx=slotEx(slot,cfg.i);
+        if(!libEx) continue;
+        section.exercises.push({
+          id:libEx.id,n:libEx.n,eq:libEx.eq,tip:libEx.tip,slot:libEx.slot,
+          sets:ch?.sets??libEx.defS,
+          reps:String(ch?.reps??libEx.defR),
+          weight:(ch&&ch.weight!==undefined)?ch.weight:libEx.defW
+        });
+      }
+      if(section.exercises.length) day.sections.push(section);
+    }
+    plan.days.push(day);
+  }
+  return plan;
+}
+
+function seedPlan(wk){
+  const p=buildPlan(wk,null);
+  p.coachNote="Week 1 foundation plan — these are your starting weights. Focus on form over load. Use the notes field to log how each session feels and the AI will personalize next week.";
+  return p;
+}
+
+function getOrCreatePlan(wk){
+  let p=S.get('il:plan:'+wk);
+  if(!p){p=seedPlan(wk);S.set('il:plan:'+wk,p);}
+  return p;
+}
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+const today=new Date();
+const todayDi=(today.getDay()+6)%7;
+const curWk=weekKey(today);
+const nxtWk=nextWeekKey(curWk);
+let activeDay=todayDi;
+let viewWk=curWk;
+let completions=S.get('il:completions')||{};
+let notes=S.get('il:notes')||{};
+let streak=S.get('il:streak')||0;
+let tips=new Set();
+let pendingPlan=null;
+let showPrev=false;
+let generating=false;
+const confirmedWeeks=new Set(); // in-memory fallback when localStorage is sandboxed
+
+// ─── PROGRESS ───────────────────────────────────────────────────────────────
+function exKey(wk,di,si,ei){return `${wk}:${di}:${si}:${ei}`;}
+function dayProg(plan,di){
+  const d=plan.days[di];if(!d)return 0;
+  let t=0,dn=0;
+  d.sections.forEach((s,si)=>s.exercises.forEach((_,ei)=>{t++;if(completions[exKey(plan.weekKey,di,si,ei)])dn++;}));
+  return t?dn/t:0;
+}
+function calcStreak(){
+  let s=0;const c=new Date(today);
+  for(let i=0;i<60;i++){
+    const wk2=weekKey(c),di2=(c.getDay()+6)%7;
+    const p2=S.get('il:plan:'+wk2);
+    if(!p2){if(i>0)break;c.setDate(c.getDate()-1);continue;}
+    if(dayProg(p2,di2)<0.8)break;
+    s++;c.setDate(c.getDate()-1);
+  }
+  streak=s;S.set('il:streak',s);
+}
+
+// ─── AI GENERATION ──────────────────────────────────────────────────────────
+function lastWeekSummary(){
+  const plan=S.get('il:plan:'+curWk);
+  if(!plan)return "No data for last week.";
+  const lines=[`Last week (${weekLabel(curWk)}):`];
+  for(const day of plan.days){
+    const cfg=DAY_CFG[day.dayIdx];
+    const pct=Math.round(dayProg(plan,day.dayIdx)*100);
+    const ds=dayDate(curWk,day.dayIdx);
+    const nt=notes[ds]||'';
+    lines.push(`${cfg.abbr} ${cfg.name}: ${pct}% complete`);
+    day.sections.forEach(s=>s.exercises.forEach(ex=>{
+      const w=ex.weight?` @ ${ex.weight}`:'';
+      lines.push(`  - ${ex.n}: ${ex.sets}×${ex.reps}${w}`);
+    }));
+    if(nt)lines.push(`  Notes: "${nt}"`);
+  }
+  return lines.join('\n');
+}
+
+function libSummary(){
+  const byDay={};
+  for(const ex of LIB){
+    if(!byDay[ex.day])byDay[ex.day]=[];
+    byDay[ex.day].push({id:ex.id,n:ex.n,slot:ex.slot,defS:ex.defS,defR:ex.defR,defW:ex.defW});
+  }
+  return JSON.stringify(byDay);
+}
+
+// Compact slot map: slot -> [{id, n, defS, defR, defW}] — much smaller than full lib dump
+function slotMap(){
+  const m={};
+  for(const ex of LIB){
+    if(!m[ex.slot])m[ex.slot]=[];
+    m[ex.slot].push({id:ex.id,n:ex.n,defS:ex.defS,defR:ex.defR,defW:ex.defW||null});
+  }
+  return JSON.stringify(m);
+}
+
+async function generatePlan(){
+  if(generating)return;
+  generating=true;
+  setLoading("ANALYZING YOUR WEEK...");
+  try{
+    const summary=lastWeekSummary();
+    setLoading("CRAFTING NEXT WEEK...");
+
+    // Build a compact slot list so the AI knows exactly what slots exist
+    const slotList=DAY_CFG.map(cfg=>
+      `Day ${cfg.i} (${cfg.abbr}): `+cfg.secs.flatMap(s=>s.slots).join(', ')
+    ).join('\n');
+
+    const prompt=`You are an expert fitness coach. Generate a weekly workout plan as JSON.
+
+LAST WEEK PERFORMANCE:
+${summary}
+
+SLOT→EXERCISE OPTIONS (pick one libraryId per slot, vary from last week):
+${slotMap()}
+
+SLOTS NEEDED PER DAY:
+${slotList}
+
+RULES: Vary exercise selection from last week. Increase weight 5 lb when last week went well. Adjust sets/reps for progression. Keep day 6 (Sun) recovery only. Use athlete notes for feedback.
+
+Respond ONLY with this exact JSON structure, no markdown:
+{"coachNote":"2-3 sentences","slots":{"slot_name":{"libraryId":"id","sets":2,"reps":"10","weight":"25 lb"}}}
+
+Use null for weight when no weight applies. Include ALL slots listed above.`;
+
+    const resp=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:4000,messages:[{role:"user",content:prompt}]})
+    });
+    if(!resp.ok)throw new Error('API '+resp.status);
+    const data=await resp.json();
+    const txt=data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(txt);
+    const plan=buildPlan(nxtWk,parsed.slots);
+    plan.coachNote=parsed.coachNote||'';
+    pendingPlan=plan;
+    showPrev=true;
+  }catch(e){
+    console.error('Plan gen error:',e);
+    pendingPlan=buildPlan(nxtWk,null);
+    pendingPlan.coachNote="Auto-generated plan — the AI will personalize once you've logged notes this week.";
+    showPrev=true;
+  }finally{
+    generating=false;
+    hideLoading();
+    render();
+  }
+}
+
+function setLoading(msg){document.getElementById('ldg').style.display='flex';document.getElementById('ldg-msg').textContent=msg;}
+function hideLoading(){document.getElementById('ldg').style.display='none';}
+
+// ─── RENDER ─────────────────────────────────────────────────────────────────
+function render(){
+  if(showPrev){renderPreview();return;}
+  document.getElementById('ov').style.display='none';
+
+  const plan=getOrCreatePlan(viewWk);
+  const cfg=DAY_CFG[activeDay];
+  const dayData=plan.days[activeDay];
+  let total=0,done=0;
+  if(dayData)dayData.sections.forEach((s,si)=>s.exercises.forEach((_,ei)=>{total++;if(completions[exKey(plan.weekKey,activeDay,si,ei)])done++;}));
+  const pct=total?done/total:0;
+
+  let wkSess=0,wkDone=0,wkTot=0;
+  for(let i=0;i<7;i++){
+    const p=dayProg(plan,i);if(p>0)wkSess++;
+    const d=plan.days[i];
+    if(d)d.sections.forEach((s,si)=>{wkTot+=s.exercises.length;s.exercises.forEach((_,ei)=>{if(completions[exKey(plan.weekKey,i,si,ei)])wkDone++;});});
+  }
+
+  const isLate=todayDi>=4;
+  const nxtExists=!!S.get('il:plan:'+nxtWk)||confirmedWeeks.has(nxtWk);
+  const showGen=viewWk===curWk&&isLate;
+  const isCurWk=viewWk===curWk;
+
+  // Date for the selected day (not always today)
+  const selDateStr=dayDate(viewWk,activeDay);
+  const selDate=new Date(selDateStr+'T00:00:00');
+  const selDateLabel=selDate.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'}).toUpperCase();
+
+  let secHtml='';
+  if(dayData){
+    dayData.sections.forEach((sec,si)=>{
+      secHtml+=`<div class="sec"><div class="slbl">${sec.name}</div>`;
+      sec.exercises.forEach((ex,ei)=>{
+        const k=exKey(plan.weekKey,activeDay,si,ei);
+        const dn=!!completions[k];
+        const to=tips.has(k);
+        const rl=ex.sets>1?`${ex.sets}×${ex.reps}`:ex.reps;
+        secHtml+=`<div class="ec${dn?' done':''}" id="ec-${si}-${ei}">
+          <div class="er">
+            <div class="eck${dn?' chk':''}" style="${dn?`background:${cfg.acc};border-color:${cfg.acc};`:''}"
+              onclick="toggleEx(${si},${ei})" tabindex="0" role="checkbox" aria-checked="${dn}"
+              onkeydown="if(event.key==='Enter'||event.key===' ')toggleEx(${si},${ei})">${dn?'✓':''}
+            </div>
+            <div class="ei">
+              <div class="en">${ex.n}</div>
+              <div class="etg">
+                <span class="tr" style="background:${cfg.aBg};color:${cfg.acc}">${rl}</span>
+                ${ex.weight?`<span class="tw" style="color:${cfg.acc}">${ex.weight}</span>`:''}
+                <span class="teq">${ex.eq}</span>
+              </div>
+            </div>
+            <button class="tipb" onclick="toggleTip('${k}')" style="${to?`color:${cfg.acc};opacity:1;`:''}">
+              ${to?'▲':'💡'}
+            </button>
+          </div>
+          ${to?`<div class="tipp">${ex.tip}</div>`:''}
+        </div>`;
+      });
+      secHtml+='</div>';
+    });
+  }
+
+  document.getElementById('app').innerHTML=`
+    <div class="hdr">
+      <div>
+        <div class="logo" style="color:${cfg.acc}">IRON LOG</div>
+        <div class="dstr">${selDateLabel}</div>
+      </div>
+      <div class="sk-box">
+        <div class="sk-num" style="color:${streak>0?cfg.acc:'var(--muted)'}">${streak}</div>
+        <div class="sk-lbl">🔥 STREAK</div>
+      </div>
+    </div>
+
+    <div class="wklbl">
+      <span>${isCurWk?'THIS WEEK':weekLabel(viewWk).toUpperCase()}</span>
+      ${!isCurWk?`<span style="color:${cfg.acc};cursor:pointer" onclick="switchWeek('${curWk}')">← THIS WEEK</span>`:''}
+      ${nxtExists&&isCurWk?`<span style="color:${cfg.acc};cursor:pointer" onclick="switchWeek('${nxtWk}')">NEXT WEEK →</span>`:''}
+    </div>
+
+    <div class="ds" id="dstrip">
+      ${DAY_CFG.map((dc,i)=>{
+        const p=dayProg(plan,i);
+        const isAct=i===activeDay;
+        const isTod=isCurWk&&i===todayDi;
+        return `<button class="db${isAct?' active':''}"
+          style="${isAct?`border-color:${dc.acc};color:${dc.acc};border-width:2px;`:''}${isTod&&!isAct?'border-color:#1e3a5f;color:#60a5fa;':''}"
+          onclick="switchDay(${i})">
+          <span class="dab">${dc.abbr}</span>
+          <span class="dem">${dc.emoji}</span>
+          <div class="dbw"><div class="dbb" style="width:${Math.round(p*100)}%;background:${dc.acc}"></div></div>
+          <span class="dck" style="color:${dc.acc}">${p===1?'✓':''}</span>
+        </button>`;
+      }).join('')}
+    </div>
+
+    ${showGen?`<div class="gen-banner" onclick="generatePlan()">
+      <span class="gen-icon">${nxtExists?'↺':'🤖'}</span>
+      <div>
+        <div class="gen-title">${nxtExists?'REGENERATE NEXT WEEK':'GENERATE NEXT WEEK'}</div>
+        <div class="gen-sub">${nxtExists?'Replace current plan with a new AI-generated one':'AI analyzes this week and builds your personalized plan'}</div>
+      </div>
+      <span class="gen-arrow">›</span>
+    </div>`:''}
+
+    <div class="wc" style="--acc:${cfg.acc}">
+      <div class="wt">
+        <div><div class="wn" style="color:${cfg.acc}">${cfg.name}</div><div class="wf">${cfg.focus}</div></div>
+        <div class="wm"><div class="wd" style="color:${cfg.acc}">${cfg.dur}</div><div class="wc2">${done}/${total} done</div></div>
+      </div>
+      <div class="wpw"><div class="wpb" id="progBar" style="width:${Math.round(pct*100)}%;background:${cfg.acc}"></div></div>
+      ${pct===1?`<div class="wcmp" style="color:${cfg.acc}">✓ WORKOUT COMPLETE</div>`:''}
+    </div>
+
+    ${plan.coachNote?`<div class="cn-card" style="--acc:${cfg.acc}"><div class="cn-lbl">COACH NOTE</div><div class="cn-txt">${plan.coachNote}</div></div>`:''}
+
+    ${secHtml}
+
+    <div class="nw">
+      <div class="nl">WORKOUT NOTES</div>
+      <textarea rows="4" placeholder="Log weights used, how you felt, what to adjust…"
+        oninput="updateNotes(this.value)">${notes[dayDate(viewWk,activeDay)]||''}</textarea>
+    </div>
+
+    <div class="ws" id="wkStats">
+      <div class="wst">${isCurWk?'THIS WEEK':weekLabel(viewWk).toUpperCase()}</div>
+      <div class="wsg">
+        <div class="wsi"><div class="wsn" id="sn0" style="color:${cfg.acc}">${wkSess}</div><div class="wsl">SESSIONS</div></div>
+        <div class="wsi"><div class="wsn" id="sn1" style="color:${cfg.acc}">${wkDone}</div><div class="wsl">EXERCISES</div></div>
+        <div class="wsi"><div class="wsn" id="sn2" style="color:${cfg.acc}">${Math.round(wkTot?wkDone/wkTot*100:0)}%</div><div class="wsl">COMPLETION</div></div>
+      </div>
+      <div class="wgg" id="wkGrid">
+        ${DAY_CFG.map((dc,i)=>{
+          const p=dayProg(plan,i);
+          const bg=p===1?dc.acc:p>0?dc.aBg:'var(--border)';
+          const col=p===1?'#fff':p>0?dc.acc:'var(--muted)';
+          const bd=isCurWk&&i===todayDi?`border:1.5px solid ${dc.acc}40;`:'';
+          return `<div class="wgc" style="background:${bg};color:${col};${bd}" onclick="switchDay(${i})">
+            ${p===1?'✓':p>0?Math.round(p*100)+'%':dc.abbr}
+          </div>`;
+        }).join('')}
+      </div>
+      <button class="rst-btn" onclick="doReset()">RESET TODAY'S LOG</button>
+    </div>
+  `;
+
+  setTimeout(()=>{
+    const s=document.getElementById('dstrip');
+    if(s)s.children[activeDay]?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  },50);
+}
+
+function renderPreview(){
+  const plan=pendingPlan;
+  if(!plan){showPrev=false;render();return;}
+  const ov=document.getElementById('ov');
+  ov.style.display='block';
+  let dHtml='';
+  for(const day of plan.days){
+    const cfg=DAY_CFG[day.dayIdx];
+    const exes=day.sections.flatMap(s=>s.exercises);
+    dHtml+=`<div class="ov-day">
+      <div class="ov-day-hdr">
+        <span style="font-size:16px">${cfg.emoji}</span>
+        <span class="ov-day-name" style="color:${cfg.acc}">${cfg.abbr} — ${cfg.name}</span>
+        <span class="ov-day-meta">${cfg.dur}</span>
+      </div>
+      ${exes.map(ex=>{
+        const r=ex.sets>1?`${ex.sets}×${ex.reps}`:ex.reps;
+        const w=ex.weight?` · ${ex.weight}`:'';
+        return `<div class="ov-ex">
+          <span class="ov-ex-n">${ex.n}</span>
+          <span class="ov-ex-r" style="color:${cfg.acc}">${r}${w}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+  ov.innerHTML=`<div class="ov-inner">
+    <div class="ov-title">NEXT WEEK'S PLAN</div>
+    <div class="ov-sub">${weekLabel(plan.weekKey)} · Review and confirm to lock it in</div>
+    <div class="ov-coach">
+      <div class="ov-coach-lbl">COACH NOTE</div>
+      <div class="ov-coach-txt">${plan.coachNote||'Your personalized plan for next week.'}</div>
+    </div>
+    ${dHtml}
+    <div class="ov-btns">
+      <button class="btn-confirm" onclick="confirmPlan()">CONFIRM THIS PLAN</button>
+      <button class="btn-regen" onclick="regenPlan()">↺ Regenerate</button>
+      <button class="btn-cancel" onclick="discardPlan()">Cancel</button>
+    </div>
+  </div>`;
+}
+
+// ─── STATS PATCH ────────────────────────────────────────────────────────────
+function patchStats(){
+  const plan=getOrCreatePlan(viewWk);
+  let ws=0,wd=0,wt=0;
+  for(let i=0;i<7;i++){
+    const p=dayProg(plan,i);if(p>0)ws++;
+    const d=plan.days[i];
+    if(d)d.sections.forEach((s,si)=>{wt+=s.exercises.length;s.exercises.forEach((_,ei)=>{if(completions[exKey(plan.weekKey,i,si,ei)])wd++;});});
+  }
+  const n0=document.getElementById('sn0'),n1=document.getElementById('sn1'),n2=document.getElementById('sn2');
+  if(n0)n0.textContent=ws;if(n1)n1.textContent=wd;if(n2)n2.textContent=Math.round(wt?wd/wt*100:0)+'%';
+  document.querySelectorAll('.wgc').forEach((cell,i)=>{
+    const dc=DAY_CFG[i],p=dayProg(plan,i);
+    cell.style.background=p===1?dc.acc:p>0?dc.aBg:'var(--border)';
+    cell.style.color=p===1?'#fff':p>0?dc.acc:'var(--muted)';
+    cell.textContent=p===1?'✓':p>0?Math.round(p*100)+'%':dc.abbr;
+  });
+}
+
+// ─── ACTIONS ────────────────────────────────────────────────────────────────
+function switchDay(i){activeDay=i;tips.clear();render();}
+function switchWeek(wk){
+  viewWk=wk;
+  // When switching to a future week, default to Monday; current week defaults to today
+  activeDay=(wk===curWk)?todayDi:0;
+  tips.clear();render();
+}
+
+function toggleEx(si,ei){
+  const plan=getOrCreatePlan(viewWk);
+  const k=exKey(plan.weekKey,activeDay,si,ei);
+  if(completions[k])delete completions[k];else completions[k]=true;
+  S.set('il:completions',completions);
+  calcStreak();
+  const dn=!!completions[k];
+  const cfg=DAY_CFG[activeDay];
+  const card=document.getElementById(`ec-${si}-${ei}`);
+  if(card){
+    card.classList.toggle('done',dn);
+    const chk=card.querySelector('.eck');
+    if(chk){chk.classList.toggle('chk',dn);chk.style.background=dn?cfg.acc:'transparent';chk.style.borderColor=dn?cfg.acc:'var(--border2)';chk.textContent=dn?'✓':'';chk.setAttribute('aria-checked',dn);}
+  }
+  const day=plan.days[activeDay];let t=0,d=0;
+  if(day)day.sections.forEach((s,ssi)=>s.exercises.forEach((_,eei)=>{t++;if(completions[exKey(plan.weekKey,activeDay,ssi,eei)])d++;}));
+  const p=t?d/t:0;
+  const bar=document.getElementById('progBar');if(bar)bar.style.width=Math.round(p*100)+'%';
+  const cnt=document.querySelector('.wc2');if(cnt)cnt.textContent=`${d}/${t} done`;
+  if(p===1){const wc=document.querySelector('.wc');if(wc&&!wc.querySelector('.wcmp')){const div=document.createElement('div');div.className='wcmp';div.style.color=cfg.acc;div.textContent='✓ WORKOUT COMPLETE';wc.appendChild(div);}}
+  const strip=document.getElementById('dstrip');
+  if(strip){const btn=strip.children[activeDay];if(btn){const db=btn.querySelector('.dbb');if(db)db.style.width=Math.round(p*100)+'%';const dk=btn.querySelector('.dck');if(dk)dk.textContent=p===1?'✓':'';}}
+  patchStats();
+}
+
+function toggleTip(k){
+  if(tips.has(k))tips.delete(k);else tips.add(k);
+  // key format: "YYYY-MM-DD:dayIdx:secIdx:exIdx" — split gives 4 parts
+  const parts=k.split(':');
+  const si=parseInt(parts[2]),ei=parseInt(parts[3]);
+  const plan=getOrCreatePlan(viewWk);
+  const cfg=DAY_CFG[activeDay];
+  const ex=plan.days[activeDay]?.sections[si]?.exercises[ei];
+  if(!ex)return;
+  const card=document.getElementById(`ec-${si}-${ei}`);
+  if(!card)return;
+  const open=tips.has(k);
+  const existing=card.querySelector('.tipp');
+  const btn=card.querySelector('.tipb');
+  if(open){
+    if(!existing){const d=document.createElement('div');d.className='tipp';d.textContent=ex.tip;card.appendChild(d);}
+    if(btn){btn.textContent='▲';btn.style.color=cfg.acc;btn.style.opacity='1';}
+  } else {
+    if(existing)existing.remove();
+    if(btn){btn.textContent='💡';btn.style.color='';btn.style.opacity='.4';}
+  }
+}
+
+function updateNotes(val){
+  const ds=dayDate(viewWk,activeDay);notes[ds]=val;S.set('il:notes',notes);
+}
+
+async function regenPlan(){
+  pendingPlan=null;document.getElementById('ov').style.display='none';showPrev=false;
+  await generatePlan();
+}
+function confirmPlan(){
+  if(!pendingPlan)return;
+  S.set('il:plan:'+nxtWk,pendingPlan);
+  confirmedWeeks.add(nxtWk);
+  document.getElementById('ov').style.display='none';
+  showPrev=false;pendingPlan=null;
+  // Auto-navigate to next week so user sees what was just confirmed
+  viewWk=nxtWk;
+  activeDay=0; // start on Monday
+  tips.clear();
+  render();
+}
+function discardPlan(){
+  document.getElementById('ov').style.display='none';showPrev=false;pendingPlan=null;render();
+}
+function doReset(){
+  if(!confirm("Reset all completed exercises for today?"))return;
+  const plan=getOrCreatePlan(viewWk);
+  const day=plan.days[activeDay];
+  if(day)day.sections.forEach((s,si)=>s.exercises.forEach((_,ei)=>{delete completions[exKey(plan.weekKey,activeDay,si,ei)];}));
+  S.set('il:completions',completions);render();
+}
+
+// ─── INIT ───────────────────────────────────────────────────────────────────
+(async()=>{
+  // Show loading while Firebase syncs
+  document.getElementById('ldg').style.display='flex';
+  document.getElementById('ldg-msg').textContent='SYNCING DATA...';
+  await initFirebase();
+  document.getElementById('ldg').style.display='none';
+  getOrCreatePlan(curWk);
+  render();
+})();
+</script>
+</body>
+</html>
